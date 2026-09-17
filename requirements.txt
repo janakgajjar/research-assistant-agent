@@ -1,0 +1,5 @@
+streamlit==1.49.1
+crewai==1.15.1
+litellm==1.91.0
+python-dotenv>=1.2.2,<2
+reportlab==4.4.4
