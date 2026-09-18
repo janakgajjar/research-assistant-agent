@@ -4,6 +4,11 @@ Reusable Streamlit UI components.
 
 import streamlit as st
 
+from utils.exporter import (
+    export_txt,
+    export_markdown,
+    export_pdf
+)
 
 def show_header():
     """
@@ -82,14 +87,8 @@ def show_agents():
 
 
 def show_report(report):
-    """
-    Display the final generated research report.
-    """
-
     st.subheader("📄 Final Research Report")
 
-    # CrewAI returns a CrewOutput object.
-    # We need to extract the actual final content.
     if hasattr(report, "raw"):
         report_content = report.raw
     elif hasattr(report, "output"):
@@ -102,11 +101,98 @@ def show_report(report):
         unsafe_allow_html=True
     )
 
-    st.markdown(
-        report_content
-    )
+    st.markdown(report_content)
 
-    st.markdown(
-        "</div>",
-        unsafe_allow_html=True
-    )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.divider()
+
+    st.subheader("⬇️ Export Report")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.download_button(
+            label="📄 Download PDF",
+            data=export_pdf(report_content),
+            file_name="research_report.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
+
+    with col2:
+        st.download_button(
+            label="📝 Download Markdown",
+            data=export_markdown(report_content),
+            file_name="research_report.md",
+            mime="text/markdown",
+            use_container_width=True
+        )
+
+    with col3:
+        st.download_button(
+            label="📃 Download TXT",
+            data=export_txt(report_content),
+            file_name="research_report.txt",
+            mime="text/plain",
+            use_container_width=True
+        )
+
+def show_history(history):
+    """
+    Display research history in the Streamlit sidebar.
+    """
+
+    with st.sidebar:
+
+        st.markdown(
+            "## 🤖 Research Assistant"
+        )
+
+        st.divider()
+
+        if st.button(
+            "➕ New Research",
+            use_container_width=True
+        ):
+            st.session_state.report = None
+            st.session_state.last_topic = ""
+            st.rerun()
+
+        st.divider()
+
+        st.markdown("### 📚 History")
+
+        if history:
+
+            if st.button(
+                "🗑️ Clear History",
+                use_container_width=True
+            ):
+                st.session_state.research_history = []
+                st.rerun()
+                
+        if not history:
+
+            st.caption(
+                "No research reports yet."
+            )
+
+            return
+
+        for index, item in enumerate(
+            reversed(history)
+        ):
+
+            topic = item["topic"]
+
+            if st.button(
+                f"🔬 {topic}",
+                key=f"history_{index}",
+                use_container_width=True
+            ):
+
+                st.session_state.report = item["report"]
+                st.session_state.last_topic = topic
+
+                st.rerun()

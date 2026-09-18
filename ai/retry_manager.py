@@ -24,21 +24,38 @@ class RetryManager:
 
         last_error = None
 
-        # Start from the first model/key combination
+        # Start from first model/key combination
         self.factory.reset()
 
         attempt = 0
 
         while self.factory.has_next():
 
-            # Get next model + API key
+            # Get next LLM configuration
             llm = self.factory.get_next_llm()
 
-            # Never expose the complete API key
-            key_preview = llm.api_key[:8]
+            # Create safe identifier
+            # Do NOT log the complete API key
+            model_name = getattr(
+                llm,
+                "model",
+                "unknown-model"
+            )
+
+            api_key = getattr(
+                llm,
+                "api_key",
+                ""
+            )
+
+            key_preview = (
+                api_key[:8]
+                if api_key
+                else "unknown"
+            )
 
             identifier = (
-                f"{llm.model}:{key_preview}"
+                f"{model_name}:{key_preview}"
             )
 
             # Check circuit breaker
@@ -57,17 +74,16 @@ class RetryManager:
 
                 logger.info(
                     f"Attempt {attempt + 1}: "
-                    f"Trying {identifier}"
+                    f"Running LLM configuration..."
                 )
 
-                # Execute Crew with current LLM
                 result = callback(llm)
 
                 # Success
                 self.breaker.reset(identifier)
 
                 logger.info(
-                    "✅ LLM execution successful."
+                    "LLM execution successful."
                 )
 
                 return result
@@ -80,11 +96,12 @@ class RetryManager:
                     f"LLM execution failed: {e}"
                 )
 
-                # Check whether error can be retried
+                # Check whether we should try
+                # another configuration
                 if ErrorClassifier.is_retryable(e):
 
                     logger.warning(
-                        "⚠️ Retryable error detected. "
+                        "Retryable error detected. "
                         "Trying next LLM configuration..."
                     )
 
@@ -100,11 +117,12 @@ class RetryManager:
 
                 # Non-retryable error
                 logger.error(
-                    "❌ Non-retryable error detected."
+                    "Non-retryable error detected."
                 )
 
                 raise
 
+        # All configurations failed
         raise RuntimeError(
             "All LLM configurations failed.\n\n"
             f"Last error: {last_error}"

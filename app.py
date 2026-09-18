@@ -9,12 +9,12 @@ from ui.styles import load_styles
 from ui.components import (
     show_header,
     show_agents,
-    show_report
+    show_report,
+    show_history
 )
 
-from crew import ResearchAssistantCrew
-from ai.llm_manager import get_llm
-
+from ai.crew_runner import CrewRunner
+from ai.topic_validator import TopicValidator
 
 # ============================================================
 # PAGE CONFIGURATION
@@ -26,6 +26,18 @@ st.set_page_config(
     layout="wide"
 )
 
+# ============================================================
+# SESSION STATE
+# ============================================================
+
+if "report" not in st.session_state:
+    st.session_state.report = None
+
+if "last_topic" not in st.session_state:
+    st.session_state.last_topic = ""
+
+if "research_history" not in st.session_state:
+    st.session_state.research_history = []
 
 # ============================================================
 # LOAD UI STYLES
@@ -74,12 +86,16 @@ generate_button = st.button(
     use_container_width=True
 )
 
-
 # ============================================================
 # EXECUTION
 # ============================================================
 
 if generate_button:
+
+    # Clear previous report whenever a new
+    # research request is started
+    st.session_state.report = None
+    st.session_state.last_topic = ""
 
     if not topic.strip():
 
@@ -89,33 +105,88 @@ if generate_button:
 
     else:
 
-        st.info(
-            f"🔍 Starting research on: **{topic}**"
-        )
+        validator = TopicValidator()
 
         try:
 
-            with st.spinner(
-                "🤖 Researcher → Writer → Reviewer are working..."
-            ):
+            # Validate topic before starting CrewAI
+            is_valid = validator.validate(topic)
 
-                llm = get_llm()
+            if is_valid is False:
 
-                crew = ResearchAssistantCrew(
-                    topic=topic,
-                    llm=llm
+                st.error(
+                    "❌ Invalid Topic\n\n"
+                    "Please enter a technology-related "
+                    "research topic."
                 )
 
-                result = crew.run()
+            elif is_valid is None:
 
-            st.success(
-                "✅ Research completed successfully!"
-            )
+                st.error(
+                    "⚠️ AI Validation Unavailable\n\n"
+                    "The topic could not be validated because "
+                    "the AI service is currently unavailable. "
+                )
+                
+            else:
 
-            show_report(result)
+                st.info(
+                    f"🔍 Starting research on: **{topic}**"
+                )
+
+                with st.spinner(
+                    "🤖 Researcher → Writer → Reviewer "
+                    "are working..."
+                ):
+
+                    runner = CrewRunner()
+                    result = runner.run(topic)
+
+                st.success(
+                    "✅ Research completed successfully!"
+                )
+
+                st.session_state.report = result
+                st.session_state.last_topic = topic
+
+                st.session_state.research_history.append({
+                    "topic": topic,
+                    "report": result
+                })
+
+                show_report(    
+                    st.session_state.report
+                )            
 
         except Exception as e:
 
             st.error(
                 f"❌ Research failed: {str(e)}"
             )
+
+
+# ============================================================
+# DISPLAY STORED REPORT
+# ============================================================
+
+if (
+    st.session_state.report is not None
+    and not generate_button
+):
+
+    st.divider()
+
+    st.info(
+        f"📄 Showing report for: "
+        f"**{st.session_state.last_topic}**"
+    )
+
+    show_report(
+        st.session_state.report
+    )
+
+st.divider()
+
+show_history(
+    st.session_state.research_history
+)
