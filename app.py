@@ -10,7 +10,9 @@ from ui.components import (
     show_header,
     show_agents,
     show_report,
-    show_history
+    show_history,
+    show_about,
+    show_footer
 )
 
 from ai.crew_runner import CrewRunner
@@ -70,9 +72,15 @@ st.divider()
 
 st.subheader("🔬 Start New Research")
 
+st.caption(
+    "Enter a technology or computer-science topic "
+    "to generate a structured research report."
+)
+
 topic = st.text_input(
-    "Enter Research Topic",
-    placeholder="Example: Agentic AI in Healthcare"
+    "Research Topic",
+    placeholder="Example: Retrieval Augmented Generation",
+    label_visibility="collapsed"
 )
 
 
@@ -134,14 +142,37 @@ if generate_button:
                     f"🔍 Starting research on: **{topic}**"
                 )
 
-                with st.spinner(
-                    "🤖 Researcher → Writer → Reviewer "
-                    "are working..."
-                ):
+                status = st.status(
+                    "🤖 AI Research Pipeline Running...",
+                    expanded=True
+                )
+
+                with status:
+
+                    st.write(
+                        "🧠 Researcher → collecting and structuring "
+                        "technical information"
+                    )
+
+                    st.write(
+                        "✍️ Writer → preparing the technical report"
+                    )
+
+                    st.write(
+                        "✅ Reviewer → checking the final report"
+                    )
 
                     runner = CrewRunner()
+
                     result = runner.run(topic)
 
+                    st.write("🎉 Final report generated")
+
+                status.update(
+                    label="✅ Research completed successfully!",
+                    state="complete",
+                    expanded=False
+                )
                 st.success(
                     "✅ Research completed successfully!"
                 )
@@ -190,3 +221,7 @@ st.divider()
 show_history(
     st.session_state.research_history
 )
+
+show_about()
+
+show_footer()

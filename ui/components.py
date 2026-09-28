@@ -11,28 +11,16 @@ from utils.exporter import (
 )
 
 def show_header():
-    """
-    Display application header.
-    """
-
     st.markdown(
-        '<div class="main-title">🤖 Research Assistant Agent</div>',
-        unsafe_allow_html=True
+        "# 🤖 Research Assistant Agent"
     )
 
-    st.markdown(
-        '<div class="subtitle">'
-        'Multi-Agent AI Research System powered by CrewAI'
-        '</div>',
-        unsafe_allow_html=True
+    st.caption(
+        "Multi-Agent AI Research System powered by CrewAI"
     )
 
 
 def show_agents():
-    """
-    Display the three AI agents.
-    """
-
     st.subheader("🧠 Multi-Agent System")
 
     col1, col2, col3 = st.columns(3)
@@ -41,13 +29,16 @@ def show_agents():
         st.markdown(
             """
             <div class="agent-card">
-
-            ### 🔎 Researcher
-
-            **Role:** AI Research Analyst
-
-            Finds and organizes relevant information.
-
+                <div style="font-size: 30px;">🔎</div>
+                <div style="font-size: 20px; font-weight: 700;">
+                    Researcher
+                </div>
+                <div class="status-text">
+                    AI Research Analyst
+                </div>
+                <br>
+                Finds and organizes relevant
+                technical information.
             </div>
             """,
             unsafe_allow_html=True
@@ -57,13 +48,16 @@ def show_agents():
         st.markdown(
             """
             <div class="agent-card">
-
-            ### ✍️ Writer
-
-            **Role:** Technical Content Writer
-
-            Converts research into a structured report.
-
+                <div style="font-size: 30px;">✍️</div>
+                <div style="font-size: 20px; font-weight: 700;">
+                    Writer
+                </div>
+                <div class="status-text">
+                    Technical Content Writer
+                </div>
+                <br>
+                Converts research into a
+                structured technical report.
             </div>
             """,
             unsafe_allow_html=True
@@ -73,18 +67,20 @@ def show_agents():
         st.markdown(
             """
             <div class="agent-card">
-
-            ### ✅ Reviewer
-
-            **Role:** Quality Reviewer
-
-            Checks accuracy, clarity and completeness.
-
+                <div style="font-size: 30px;">✅</div>
+                <div style="font-size: 20px; font-weight: 700;">
+                    Reviewer
+                </div>
+                <div class="status-text">
+                    Quality Reviewer
+                </div>
+                <br>
+                Checks accuracy, clarity
+                and completeness.
             </div>
             """,
             unsafe_allow_html=True
         )
-
 
 def show_report(report):
     st.subheader("📄 Final Research Report")
@@ -171,7 +167,7 @@ def show_history(history):
             ):
                 st.session_state.research_history = []
                 st.rerun()
-                
+
         if not history:
 
             st.caption(
@@ -196,3 +192,92 @@ def show_history(history):
                 st.session_state.last_topic = topic
 
                 st.rerun()
+
+def show_about():
+    """
+    Display project information in the sidebar.
+    """
+
+    with st.sidebar:
+
+        st.divider()
+
+        with st.expander("ℹ️ About Project"):
+
+            st.markdown("### 🤖 Research Assistant Agent")
+
+            st.caption(
+                "Multi-Agent AI Research System"
+            )
+
+            st.markdown(
+                """
+                An AI-powered research assistant that
+                validates technology topics and uses
+                specialized AI agents to research, write,
+                and review technical reports.
+                """
+            )
+
+            st.markdown("#### 🧠 Agent Architecture")
+
+            st.markdown(
+                """
+                **🔎 Researcher**  
+                Researches and structures technical information.
+
+                **✍️ Writer**  
+                Converts research into a professional report.
+
+                **✅ Reviewer**  
+                Reviews the report for accuracy,
+                clarity and completeness.
+                """
+            )
+
+            st.markdown("#### ⚙️ Technology Stack")
+
+            st.markdown(
+                """
+                - 🐍 Python
+                - 🤖 CrewAI
+                - ✨ Google Gemini
+                - 🔌 LiteLLM
+                - 🎨 Streamlit
+                - 📄 ReportLab
+                """
+            )
+
+            st.markdown("#### 🔄 Workflow")
+
+            st.code(
+                "Topic Validation\n"
+                "      ↓\n"
+                "Researcher\n"
+                "      ↓\n"
+                "Writer\n"
+                "      ↓\n"
+                "Reviewer\n"
+                "      ↓\n"
+                "Final Report",
+                language="text"
+            )
+
+            st.markdown("#### 📄 Export Formats")
+
+            st.write(
+                "PDF • Markdown • TXT"
+            )
+
+            st.caption(
+                "Built as an MCA Agentic AI project."
+            )
+
+def show_footer():
+    st.divider()
+
+    st.caption(
+        "🤖 Research Assistant Agent  •  "
+        "Agentic AI Project  •  "
+        "@copyright 2026 - All right reserved"
+    )

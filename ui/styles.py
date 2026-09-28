@@ -8,73 +8,61 @@ import streamlit as st
 
 
 def load_styles():
-    """
-    Load custom CSS styles for the Streamlit application.
-    """
 
     st.markdown(
         """
         <style>
 
-        /* -----------------------------
-           Main Application
-        ----------------------------- */
-
+        /* Main application container */
         .block-container {
             padding-top: 2rem;
-            padding-bottom: 2rem;
+            padding-bottom: 3rem;
             max-width: 1200px;
         }
 
-
-        /* -----------------------------
-           Main Title
-        ----------------------------- */
-
-        .main-title {
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            font-size: 18px;
-            opacity: 0.70;
-            margin-bottom: 25px;
-        }
-
-
-        /* -----------------------------
-           Agent Cards
-        ----------------------------- */
-
+        /* Agent cards */
         .agent-card {
-            padding: 20px;
-            border-radius: 12px;
+            padding: 22px;
+            border-radius: 14px;
             border: 1px solid rgba(128, 128, 128, 0.25);
-            min-height: 150px;
+            min-height: 175px;
+            transition: all 0.2s ease;
         }
 
+        .agent-card:hover {
+            border-color: rgba(128, 128, 128, 0.45);
+            transform: translateY(-2px);
+        }
 
-        /* -----------------------------
-           Report Container
-        ----------------------------- */
-
+        /* Report container */
         .report-card {
-            padding: 25px;
-            border-radius: 12px;
+            padding: 28px;
+            border-radius: 14px;
             border: 1px solid rgba(128, 128, 128, 0.25);
             margin-top: 20px;
+            line-height: 1.7;
         }
 
-
-        /* -----------------------------
-           Small Status Text
-        ----------------------------- */
-
+        /* Secondary text */
         .status-text {
             font-size: 14px;
             opacity: 0.70;
+        }
+
+        /* Sidebar spacing */
+        section[data-testid="stSidebar"] {
+            padding-top: 1rem;
+        }
+
+        /* Download buttons */
+        div.stDownloadButton > button {
+            width: 100%;
+        }
+
+        /* Slightly cleaner dividers */
+        hr {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
         </style>
